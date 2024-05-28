@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*", "example.ts", "run-error.ts", "compile-error.ts"],
+  "exclude": ["node_modules"]
+}

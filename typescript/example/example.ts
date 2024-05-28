@@ -1,0 +1,1 @@
+let myName: string = "baekki";

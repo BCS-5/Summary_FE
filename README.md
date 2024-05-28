@@ -1,4 +1,4 @@
-# <img src="https://docs.soliditylang.org/en/latest/_images/solidity_logo.svg" width="35" height="35"> BCS-5 Frontend
+# BCS-5 Frontend
 
 강의내용 요약 및 코드 공유드립니다. 복습하세요!🧑‍💻
 
@@ -29,3 +29,5 @@
   > 토큰 이름 가져오기  
   > 지갑의 잔고(balance) 가져오기  
   > 특정 지갑의 잔고(balance) 가져오기
+
+- 2024.5.28
