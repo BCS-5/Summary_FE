@@ -3,4 +3,6 @@
 
 let someValue: any = "this is a string";
 
-someValue;
+let result: string = (someValue as string).substring(5);
+
+console.log(result);
