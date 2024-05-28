@@ -5,10 +5,10 @@ import { FC } from "react";
 interface BoxProps {
   name: string;
   bgColor: string;
-  isRounded: boolean;
+  isRounded?: boolean;
 }
 
-const Box: FC<BoxProps> = ({ name, bgColor, isRounded }) => {
+const Box: FC<BoxProps> = ({ name, bgColor, isRounded = false }) => {
   return (
     <div
       className={`${bgColor} ${

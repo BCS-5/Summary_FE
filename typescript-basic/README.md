@@ -30,12 +30,7 @@ console.log(message);
 
 > node example.ts
 
-<img
-  src="example1.png"
-  width="718"
-  height="404"
-  alt="connect local"
-/>
+> Let message: string = "Hello, TypeScript"; SyntaxError: Unexpected token ':'
 
 위와 같은 에러가 발생하는 것을 볼 수 있습니다. 이 에러는 위 코드를 js로 변환해줘야 하는 것을 의미합니다.
 

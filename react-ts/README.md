@@ -5,11 +5,13 @@
 ### tempalte
 
 > npm create vite@latest . -- --template react-ts
+
 > npm install
 
 ### install tawildins css
 
 > npm install -D tailwindcss postcss autoprefixer
+
 > npx tailwindcss init -p
 
 - tailwind.config.js 교체
@@ -163,5 +165,125 @@ export default Box;
 <img
   src="public/readme/result1.png"
   width="718"
-  alt="box component result"
+  alt="box component result1"
+/>
+
+Box 컴포넌트에서 isRounded를 기본 false값을 주고 싶다면 아래와 같이 수정 할 수 있습니다.
+
+```typescript
+// src/components/Box.tsx
+
+import { FC } from "react";
+
+interface BoxProps {
+  name: string;
+  bgColor: string;
+  isRounded?: boolean;
+}
+
+const Box: FC<BoxProps> = ({ name, bgColor, isRounded = false }) => {
+  return (
+    <div
+      className={`${bgColor} ${
+        isRounded && "rounded-full"
+      } w-96 h-96 text-3xl font-bold flex justify-center items-center`}
+    >
+      {name}
+    </div>
+  );
+};
+
+export default Box;
+```
+
+```typescript
+// App.tsx
+
+import { FC } from "react";
+import Box from "./components/Box";
+
+const App: FC = () => {
+  return (
+    <div className="bg-red-100 min-h-screen flex flex-col justify-center items-center gap-20">
+      <Box name="banana" bgColor="bg-yellow-100" isRounded={false} />
+      <Box name="apple" bgColor="bg-red-300" isRounded={true} />
+      <Box name="melon" bgColor="bg-green-300" isRounded={false} />
+      <Box name="mango" bgColor="bg-yellow-300" />
+      <Box name="grape" bgColor="bg-purple-500" />
+    </div>
+  );
+};
+
+export default App;
+```
+
+위 처럼 isRouned는 필수값으로 타입을 정하지 않고, 기본 값으로 false를 적용 할 수 있습니다.
+
+이제 count예제도 만들어봅시다.
+
+```typescript
+// App.tsx
+
+import { FC, useState } from "react";
+import Box from "./components/Box";
+
+const App: FC = () => {
+  const [count, setCount] = useState<number>(0);
+
+  return (
+    <div className="bg-red-100 min-h-screen flex flex-col justify-center items-center gap-20">
+      <Box name="banana" bgColor="bg-yellow-100" isRounded={false} />
+      <Box name="apple" bgColor="bg-red-300" isRounded={true} />
+      <Box name="melon" bgColor="bg-green-300" isRounded={false} />
+      <Box name="mango" bgColor="bg-yellow-300" />
+      <Box name="grape" bgColor="bg-purple-500" />
+    </div>
+  );
+};
+
+export default App;
+```
+
+useState 훅을 사용하는 기본 방법은 다음과 같습니다.
+
+> const [state, setState] = useState<타입>(초기값);
+
+위 문법에서 타입 부분에 제네릭 타입을 지정하고, 초기값 부분에 상태 변수의 초기값을 설정합니다.
+
+```typescript
+// App.tsx
+
+import { FC, useState } from "react";
+import Box from "./components/Box";
+
+const App: FC = () => {
+  const [count, setCount] = useState<number>(0);
+
+  return (
+    <>
+      <div className="bg-red-100 flex justify-center items-center gap-20 py-40 font-bold text-4xl">
+        <button onClick={() => setCount(count - 1)}>-</button>
+        {count}
+        <button onClick={() => setCount(count + 1)}>+</button>
+      </div>
+      <div className="bg-red-100 min-h-screen flex flex-col justify-center items-center gap-20">
+        <Box name="banana" bgColor="bg-yellow-100" isRounded={false} />
+        <Box name="apple" bgColor="bg-red-300" isRounded={true} />
+        <Box name="melon" bgColor="bg-green-300" isRounded={false} />
+        <Box name="mango" bgColor="bg-yellow-300" />
+        <Box name="grape" bgColor="bg-purple-500" />
+      </div>
+    </>
+  );
+};
+
+export default App;
+```
+
+위 코드를 실행하면 아래와 같고, count가 실행되는 것을 확인 할 수 있습니다.
+
+<img
+  src="public/readme/result2.png"
+  width="718"
+  alt="box component result1"
 />
