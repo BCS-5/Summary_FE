@@ -50,3 +50,119 @@ export default App;
 ```
 
 함수형 컴포넌트는(Functional Component) React 컴포넌트를 정의하는 함수로, 간단하고 상태 관리가 필요 없는 컴포넌트를 작성할 때 주로 사용됩니다.
+
+## props
+
+그럼 props의 타입은 어떻게 정의할까요?
+
+아래 Box.tsx 컴포넌트를 만들어주시고, 예제로 확인해 보겠습니다.
+
+```typescript
+// src/components/Box.tsx
+
+import { FC } from "react";
+
+const Box: FC<{ name: string; bgColor: string; isRounded: boolean }> = ({
+  name,
+  bgColor,
+  isRounded,
+}) => {
+  return (
+    <div
+      className={`${bgColor} ${
+        isRounded && "rounded-full"
+      } w-96 h-96 text-3xl font-bold`}
+    >
+      {name}
+    </div>
+  );
+};
+
+export default Box;
+```
+
+컴포넌트 타입인 FC는 컴포넌트 옆에 바로 작성하고, props로 받는 것들의 타입은 제네릭 형태로 작성하면 됩니다.
+
+위 형태를 인터페이스로 작성해봅시다!
+
+```typescript
+// src/components/Box.tsx
+
+import { FC } from "react";
+
+interface BoxProps {
+  name: string;
+  bgColor: string;
+  isRounded: boolean;
+}
+
+const Box: FC<BoxProps> = ({ name, bgColor, isRounded }) => {
+  return (
+    <div
+      className={`${bgColor} ${
+        isRounded && "rounded-full"
+      } w-96 h-96 text-3xl font-bold flex justify-center items-center`}
+    >
+      {name}
+    </div>
+  );
+};
+
+export default Box;
+```
+
+App.tsx도 작성해서 결과물을 확인해 봅시다!
+
+```typescript
+// App.tsx
+
+import { FC } from "react";
+import Box from "./components/Box";
+
+const App: FC = () => {
+  return (
+    <div className="bg-red-100 min-h-screen flex flex-col justify-center items-center gap-20">
+      <Box name="banana" bgColor="bg-yellow-300" isRounded={false} />
+      <Box name="apple" bgColor="bg-red-300" isRounded={true} />
+      <Box name="melon" bgColor="bg-green-300" isRounded={false} />
+    </div>
+  );
+};
+
+export default App;
+```
+
+```typescript
+// src/components/Box.tsx
+
+import { FC } from "react";
+
+interface BoxProps {
+  name: string;
+  bgColor: string;
+  isRounded: boolean;
+}
+
+const Box: FC<BoxProps> = ({ name, bgColor, isRounded }) => {
+  return (
+    <div
+      className={`${bgColor} ${
+        isRounded && "rounded-full"
+      } w-96 h-96 text-3xl font-bold flex justify-center items-center`}
+    >
+      {name}
+    </div>
+  );
+};
+
+export default Box;
+```
+
+아래 이미지와 같은 결과를 확인 할 수 있습니다.
+
+<img
+  src="public/readme/result1.png"
+  width="718"
+  height="404"
+  alt="box component result"
+/>
