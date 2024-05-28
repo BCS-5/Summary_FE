@@ -163,6 +163,5 @@ export default Box;
 <img
   src="public/readme/result1.png"
   width="718"
-  height="404"
   alt="box component result"
 />
