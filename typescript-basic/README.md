@@ -1,4 +1,4 @@
-# typescript
+# Typescript Basic
 
 ## 설치하기
 
