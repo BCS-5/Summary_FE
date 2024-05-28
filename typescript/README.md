@@ -295,7 +295,7 @@ console.log(yourName);
 
 타입을 알 수 없는 외부 API로부터 데이터를 호출 하는데 타입을 모를경우, 다양한 타입을 처리해야하는 경우 사용 할 수 있겠죠?
 
-## 함수
+### 함수
 
 ```typescript
 // 5.ts
@@ -328,7 +328,7 @@ function greet(name: string, greeting?: string): string;
 
 이를, 선택적 매개변수와 기본값 이라 합니다.
 
-## 인터페이스
+### 인터페이스
 
 TypeScript에서 인터페이스(Interface)는 객체의 구조를 정의하는 데 사용됩니다. 인터페이스는 객체가 가져야 할 프로퍼티와 메서드의 타입을 지정하여, 코드의 타입 안전성을 높이고 가독성을 개선하는 데 도움이 됩니다. 인터페이스는 클래스나 객체가 특정 구조를 따르도록 강제하는 역할을 합니다.
 
@@ -573,3 +573,92 @@ console.log(fourProfile);
 ```
 
 ‼️ extends 키워드를 사용해서 확장이 가능합니다.
+
+## 클래스
+
+클래스는 객체의 상태를 나타내는 속성(프로퍼티)과 객체의 동작을 정의하는 메서드(함수)를 포함합니다. TypeScript에서 클래스를 정의하려면 class 키워드를 사용합니다.
+
+### 클래스 멤버
+
+- 프로퍼티 (Properties): 객체의 상태를 나타내는 변수입니다.
+
+  ```typescript
+  class Person {
+    name: string;
+    age: number;
+  }
+  ```
+
+- 생성자 (Constructor): 객체가 생성될 때 호출되는 특별한 메서드입니다. 주로 객체의 초기 상태를 설정하는 데 사용됩니다.
+
+  ```typescript
+  class Person {
+    name: string;
+    age: number;
+
+    constructor(name: string, age: number) {
+      this.name = name;
+      this.age = age;
+    }
+  }
+  ```
+
+- 메서드 (Methods): 객체의 동작을 정의하는 함수입니다.
+
+  ```typescript
+  class Person {
+    name: string;
+    age: number;
+
+    constructor(name: string, age: number) {
+      this.name = name;
+      this.age = age;
+    }
+
+    greet(): void {
+      console.log(`Hello, my name is ${this.name}.`);
+    }
+  }
+  ```
+
+- 이 외에도 접근제어자, 상속 등 있습니다.
+  - 접근 제어자: 클래스 멤버의 가시성을 제어하는 키워드 (public, private, protected).
+  - 상속: 기존 클래스의 특성을 물려받아 새로운 클래스를 정의하는 기능.
+
+## 제네릭
+
+제네릭(Generic)은 TypeScript에서 함수, 클래스, 인터페이스 등의 다양한 부분에서 타입을 매개변수화할 수 있는 방법을 제공합니다. 제네릭을 사용하면 구체적인 타입을 지정하지 않고, 타입을 변수처럼 다룰 수 있어 다양한 타입에 대해 동작하는 범용 코드를 작성할 수 있습니다.
+
+```typescript
+// function identity<T>(arg: T): T {
+//     return arg;
+// }
+
+// let output1 = identity<string>("myString");
+// let output2 = identity<number>(100);
+
+function identityNumber(arg: number): number {
+  return arg;
+}
+
+function identityString(arg: string): string {
+  return arg;
+}
+
+console.log(identityNumber(10));
+console.log(identityString("10"));
+```
+
+제네릭을 사용하지 않는다면 위처럼 작성해야 하지만, 제네릭을 사용한다면 아래처럼 범용적으로 사용이 가능합니다.
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+let output1 = identity<string>("myString");
+let output2 = identity<number>(100);
+
+console.log(output1);
+console.log(output2);
+```
