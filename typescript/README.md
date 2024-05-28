@@ -160,7 +160,7 @@ let myProfile: { name: string } = {
 greet(null);
 ```
 
-‼️ void는 결과값이 없을 경우 입니다. 결과 값이 없다고 타입을 안적는 것이 아닙니다!
+‼️ 함수명뒤의 ':void' 타입 적는 위치는, 아웃풋의 타입을 적어줍니다. 아웃풋 타입이 숫자일 경우는 number를 적습니다. void는 결과값이 없을 경우 입니다. 결과 값이 없다고 타입을 안적는 것이 아닙니다!
 
 위 코드를 작성하면 아래와 같은 오류가 발생합니다.
 
@@ -203,7 +203,7 @@ add(2, "3");
 
 ## types
 
-- 숫자(number), 문자열(string), 불리언(boolean)
+### 숫자(number), 문자열(string), 불리언(boolean)
 
 ```typescript
 // 1.ts
@@ -220,7 +220,7 @@ console.log(myName, age, isRich);
 
 > 결과 : baekki 30 false
 
-- 배열
+### 배열
 
 ```typescript
 // 2.ts
@@ -236,7 +236,7 @@ console.log(list, fruits);
 
 > 결과 : [ 1, 2, 3, 4, 5 ] [ 'apple', 'banana', 'kiwi' ]
 
-- 튜플
+### 튜플
 
 튜플은 고정된 개수의 요소를 ㅏㄱ지고, 각 요소의 타입이 미리 정해진 배열입니다.
 
@@ -270,4 +270,234 @@ person = [25, "Alice"]; // Error: Type 'number' is not assignable to type 'strin
   > let array: (string | number)[] = ["Alice", 25, "Bob", 30];
 
 - 튜플 : 각 요소의 타입과 순서가 고정되어 있음. 고정된 개수의 요소를 가짐.
+
   > let tuple: [string, number] = ["Alice", 25];
+
+### any
+
+반면, any 타입은 string, number, bool 등 어떠한 타입도 올 수 있습니다.
+
+```typescript
+// 3.ts
+
+let allVars: any[] = ["baekki", 30, true, 1234, "abcd", false];
+
+console.log(allVars);
+
+let yourName: any = 1234;
+
+console.log(yourName);
+```
+
+모두 any타입으로 처리하면 판하죠! 하지만 모두 any타입으로 처리하면 타입스크립트를 사용 할 이유가 없겠죠?
+
+그럼 any타입은 언제 사용할까요?
+
+타입을 알 수 없는 외부 API로부터 데이터를 호출 하는데 타입을 모를경우, 다양한 타입을 처리해야하는 경우 사용 할 수 있겠죠?
+
+## 함수
+
+```typescript
+// 5.ts
+
+function greet(name: string, greeting: string = "Hello"): string {
+  return `${greeting}, ${name}`;
+}
+
+console.log(greet("baekki"));
+
+console.log(greet("baekki", "Hi"));
+```
+
+위 greet 함수를 보면, name과 greeting두 가지 매개변수를 갖고, greeting에는 string 타입으로 "Hello" 값이 할당되어 있습니다.
+
+두 코드를 실행해보면 결과는 아래와 같습니다.
+
+> Hello, baekki
+> Hi, baekki
+
+greet("baekki") 의 경우는, 매개변수가 2개 더라도 함수를 확인해보면 아래와 같습니다.
+
+```typescript
+function greet(name: string, greeting?: string): string;
+```
+
+여기서 '?' 기호는 TypeScript에서 선택적 프로퍼티(Optional Property)를 나타냅니다. 이는 특정 프로퍼티가 반드시 필요하지 않음을 의미하며, 해당 프로퍼티가 없어도 객체가 인터페이스를 충족할 수 있게 합니다.
+
+따라서, name("baekki")만 받고, greeting 매개변수가 없다면 "Hello" 값을 출력합니다.
+
+이를, 선택적 매개변수와 기본값 이라 합니다.
+
+## 인터페이스
+
+TypeScript에서 인터페이스(Interface)는 객체의 구조를 정의하는 데 사용됩니다. 인터페이스는 객체가 가져야 할 프로퍼티와 메서드의 타입을 지정하여, 코드의 타입 안전성을 높이고 가독성을 개선하는 데 도움이 됩니다. 인터페이스는 클래스나 객체가 특정 구조를 따르도록 강제하는 역할을 합니다.
+
+```typescript
+// 6.ts
+
+let yourProfile: {
+  name: string;
+  age: number;
+  isRich: boolean;
+} = {
+  name: "baekki",
+  age: 30,
+  isRich: false,
+};
+
+console.log(yourProfile);
+```
+
+> 결과 : { name: 'baekki', age: 30, isRich: false }
+
+그럼 아래 코드를 확인해 볼까요?
+
+```typescript
+// 6.ts
+
+let myProfile: {
+  name: string;
+  age: number;
+  isRich: boolean;
+} = {
+  name: "baekki",
+  age: 30,
+  isRich: true,
+};
+
+console.log(myProfile);
+
+let yourProfile: {
+  name: string;
+  age: number;
+  isRich: boolean;
+} = {
+  name: "h663",
+  age: 99,
+  isRich: false,
+};
+
+console.log(yourProfile);
+```
+
+myProfile, yourProfile을 보면, 같은 타입이 중복됩니다. 이럴 경우, 타입을 인터페이스로 정의해서 사용이 가능합니다.
+
+인터페이스를 사용해서 아래처럼 코드를 수정할 수 있습니다.
+
+```typescript
+// 6.ts
+
+interface IProfile {
+  name: string;
+  age: number;
+  isRich: boolean;
+}
+
+let myProfile: IProfile = {
+  name: "baekki",
+  age: 30,
+  isRich: true,
+};
+
+console.log(myProfile);
+
+let yourProfile: IProfile = {
+  name: "h663",
+  age: 99,
+  isRich: false,
+};
+
+console.log(yourProfile);
+```
+
+선택적 프로퍼티도 적용해볼까요?
+
+```typescript
+interface IProfile {
+  name: string;
+  age: number;
+  isRich?: boolean;
+}
+
+let myProfile: IProfile = {
+  name: "baekki",
+  age: 30,
+  isRich: true,
+};
+
+console.log(myProfile);
+
+let yourProfile: IProfile = {
+  name: "h663",
+  age: 99,
+};
+
+console.log(yourProfile);
+```
+
+위 코드에서 IProfile 인터페이스에서 isRich는 선택적 프로퍼티 입니다. 따라서 yourProfile에서 isRich는 필수가 아닙니다.
+
+### 타입 별칭(Type Alias)
+
+타입스크립트에서 타입 별칭(Type Alias)은 특정 타입에 대해 별칭을 지정하여, 그 타입을 더 읽기 쉽고 간결하게 표현할 수 있게 해주는 기능입니다. 타입 별칭은 type 키워드를 사용하여 정의하며, 기본 타입, 객체 타입, 유니언 타입, 튜플 등 다양한 타입을 별칭으로 지정할 수 있습니다.
+
+- 기본 타입 별칭  
+  기본 타입에 대해 별칭을 지정할 수 있습니다.
+
+  ```typescript
+  type MyString = string;
+
+  let name: MyString = "Alice";
+  ```
+
+- 객체 타입 별칭
+  객체 타입에도 별칭을 지정할 수 있습니다.
+
+  ```typescript
+  type Person = {
+    name: string;
+    age: number;
+  };
+
+  let person: Person = {
+    name: "Bob",
+    age: 25,
+  };
+  ```
+
+- 유니언 타입 별칭
+  유니언 타입을 별칭으로 지정하여 여러 타입을 하나의 별칭으로 결합할 수 있습니다. 유니언 타입(Union Type)은 변수나 함수가 여러 타입을 가질 수 있도록 하는 기능입니다. 유니언 타입은 | 기호를 사용하여 두 개 이상의 타입을 결합합니다. 이를 통해 하나의 변수나 함수 인수가 여러 타입을 허용할 수 있습니다.
+
+  ```typescript
+  let value: string | number;
+
+  value = "hello"; // OK
+  value = 42; // OK
+  ```
+
+아래 예제도 살펴보세요!
+
+```typescript
+// 7.ts
+
+type TProfile = {
+  name: string;
+  age: number;
+  isRich?: boolean;
+};
+
+let oneProfile: TProfile = {
+  name: "h662",
+  age: 20,
+  isRich: true,
+};
+
+console.log(oneProfile);
+
+let twoProfile: TProfile = {
+  name: "h663",
+  age: 99,
+};
+
+console.log(twoProfile);
+```
