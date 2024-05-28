@@ -33,12 +33,12 @@
 - 2024.5.28
 
   > typescript install  
-  > types
+  > types  
   > 클래스 (Clas)  
   > 제네릭 (Generic)  
   > 타입 단언 (Type Assertion)
 
   > React + Typescript  
-  > 기본 셋팅
-  > 함수형 컴포넌트 (Functional Compoenent)
+  > 기본 셋팅  
+  > 함수형 컴포넌트 (Functional Compoenent)  
   > Props

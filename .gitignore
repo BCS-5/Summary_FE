@@ -1,3 +1,5 @@
+.DS_Store
+
 # deps는 
 .env
 .deps
