@@ -465,16 +465,6 @@ console.log(yourProfile);
   };
   ```
 
-- 유니언 타입 별칭
-  유니언 타입을 별칭으로 지정하여 여러 타입을 하나의 별칭으로 결합할 수 있습니다. 유니언 타입(Union Type)은 변수나 함수가 여러 타입을 가질 수 있도록 하는 기능입니다. 유니언 타입은 | 기호를 사용하여 두 개 이상의 타입을 결합합니다. 이를 통해 하나의 변수나 함수 인수가 여러 타입을 허용할 수 있습니다.
-
-  ```typescript
-  let value: string | number;
-
-  value = "hello"; // OK
-  value = 42; // OK
-  ```
-
 아래 예제도 살펴보세요!
 
 ```typescript
@@ -501,3 +491,85 @@ let twoProfile: TProfile = {
 
 console.log(twoProfile);
 ```
+
+- 유니언 타입 별칭
+  유니언 타입을 별칭으로 지정하여 여러 타입을 하나의 별칭으로 결합할 수 있습니다. 유니언 타입(Union Type)은 변수나 함수가 여러 타입을 가질 수 있도록 하는 기능입니다. 유니언 타입은 | 기호를 사용하여 두 개 이상의 타입을 결합합니다. 이를 통해 하나의 변수나 함수 인수가 여러 타입을 허용할 수 있습니다.
+
+  ```typescript
+  let value: string | number;
+
+  value = "hello"; // OK
+  value = 42; // OK
+  ```
+
+  타입은 가능하면 범위를 좁혀주는게 좋습니다. 모두 any로 하는건 가장 넓은 포괄적은 범위입니다.
+
+  ```typescript
+  type ID = string;
+
+  type Days = "Monday" | "Friday" | "Sunday";
+  ```
+
+### 교차 타입 (Intersection Type)
+
+교차 타입(Intersection Type)은 여러 타입을 하나로 결합하여 모든 타입의 멤버를 포함하는 새로운 타입을 만드는 기능입니다. 교차 타입은 & 기호를 사용하여 정의합니다. 이를 통해 두 개 이상의 타입을 결합하여 하나의 객체가 모든 결합된 타입의 특성을 가져야 하도록 강제할 수 있습니다.
+
+```typescript
+// 9.ts
+
+type TProfile2 = {
+  name: string;
+  age: number;
+  isRich?: boolean;
+};
+
+type TJob = {
+  job: string;
+};
+
+type TJobProfile = TProfile2 & TJob;
+
+const threeProfile: TJobProfile = {
+  name: "baekki",
+  age: 30,
+  isRich: false,
+  job: "Programmer",
+};
+
+console.log(threeProfile);
+```
+
+위 예시에서 TJobProfile = TProfile2 & TJob은 아래처럼 변경 할 수 있습니다.
+
+```typescript
+// 10.ts
+
+type TJobProfile = TProfile2 & {
+  job: string;
+};
+```
+
+또는 아래처럼 interface 및 extends 키워드를 사용해서 작성해봅시다.
+
+```typescript
+interface IProfile2 {
+  name: string;
+  age: number;
+  isRich?: boolean;
+}
+
+interface IJobProfile extends IProfile2 {
+  job: string;
+}
+
+const fourProfile: IJobProfile = {
+  name: "baekki",
+  age: 30,
+  isRich: false,
+  job: "Programmer",
+};
+
+console.log(fourProfile);
+```
+
+‼️ extends 키워드를 사용해서 확장이 가능합니다.
