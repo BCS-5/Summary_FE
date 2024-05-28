@@ -652,6 +652,8 @@ console.log(identityString("10"));
 제네릭을 사용하지 않는다면 위처럼 작성해야 하지만, 제네릭을 사용한다면 아래처럼 범용적으로 사용이 가능합니다.
 
 ```typescript
+// 11.ts
+
 function identity<T>(arg: T): T {
   return arg;
 }
@@ -661,4 +663,104 @@ let output2 = identity<number>(100);
 
 console.log(output1);
 console.log(output2);
+```
+
+### 제네릭 클래스
+
+제네릭 클래스는 타입 매개변수를 사용하여 다양한 타입을 처리할 수 있는 클래스를 정의합니다.
+
+```typescript
+class GenericNumber<T, S> {
+  zeroValue: T;
+  add: (x: T, y: S) => T;
+}
+
+let myGenericNumber = new GenericNumber<number, string>();
+myGenericNumber.zeroValue = 0;
+myGenericNumber.add = function (x, y) {
+  return x + y;
+};
+```
+
+## 타입 단언
+
+타입 단언(Type Assertion)은 TypeScript에서 특정 값이 어떤 타입임을 개발자가 명확히 알려주는 방법입니다. 타입 단언을 통해 컴파일러에게 특정 값의 타입을 단언함으로써, 해당 값이 그 타입임을 보장할 수 있습니다.
+
+```typescript
+// let someValue: any = "this is a string";
+// let strLength: number = (someValue as string).length;
+
+let someValue: any = "this is a string";
+
+someValue;
+```
+
+위 예시 코드는 아무런 동작을 하지 않습니다.
+
+아래 코드와 비교해보죠!
+
+```typescript
+// let someValue: any = "this is a string";
+// let strLength: number = (someValue as string).length;
+
+let someValue: any = "this is a string";
+
+let result: string = (someValue as string).substring(5);
+
+console.log(result);
+```
+
+someValue가 string이라고 단언해서 (someValue as string). 을 입력하면, 사용 할 수 있는 메서드들도 확인 할 수 있습니다.
+
+## 타입 가드
+
+타입 가드는 변수의 타입을 좁혀 특정 타입임을 확인하고, 해당 타입에 안전하게 접근할 수 있게 하는 방법입니다. 타입 가드를 통해 코드 내에서 변수의 타입을 명확하게 할 수 있으며, 런타임 오류를 방지하고 타입 안전성을 유지할 수 있습니다.
+
+### typeof
+
+typeof 연산자는 변수의 기본 타입(primitive type)을 확인할 때 사용됩니다. 예를 들어, 문자열인지 숫자인지 확인할 수 있습니다.
+
+```typescript
+function printValue(value: string | number) {
+  if (typeof value === "string") {
+    console.log(`The value is a string: ${value}`);
+  } else {
+    console.log(`The value is a number: ${value}`);
+  }
+}
+
+printValue("hello"); // hello
+printValue(42); // 42
+```
+
+### instanceof
+
+instanceof 연산자는 객체가 특정 클래스의 인스턴스인지 확인할 때 사용됩니다.
+
+```typescript
+class Dog {
+  bark() {
+    console.log("Woof!");
+  }
+}
+
+class Cat {
+  meow() {
+    console.log("Meow!");
+  }
+}
+
+function makeSound(animal: Dog | Cat) {
+  if (animal instanceof Dog) {
+    animal.bark(); // Dog 타입일 때만 실행
+  } else {
+    animal.meow(); // Cat 타입일 때만 실행
+  }
+}
+
+const myDog = new Dog();
+const myCat = new Cat();
+
+makeSound(myDog); // Woof!
+makeSound(myCat); // Meow!
 ```
