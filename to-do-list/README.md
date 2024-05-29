@@ -201,12 +201,6 @@ export default TodoCard;
 
 Text 속성 중 isTruncated는 글자수가 넓이인 w={48}을 넘어간다면, ... 으로 처리합니다.
 
-<img
-  src="public/readme/todo4.png"
-  width="718"
-  alt="todo4"
-/>
-
 그리고 TodoList에서 임포트 합니다.
 
 ```typescript
