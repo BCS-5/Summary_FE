@@ -48,3 +48,14 @@
   > Props
 
 ### chakra-ui
+
+- 2024.5.29
+
+  > Chakra UI Setup  
+  > Practice
+
+### To Do List
+
+> 기본 셋팅  
+> 컴포넌트  
+> CRUD
