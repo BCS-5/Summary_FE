@@ -1119,3 +1119,339 @@ export default TodoCard;
 ```
 
 코드를 실행해서 삭제가 잘 작동하는지 확인해보세요!
+
+### 수정 (Update)
+
+수정하려면 content는 isDone처럼 true/false 토글처리가 안되기 때문에, 수정 창이 열려있는지의 여부를 확인해서 수정이 가능하도록 useState를 만들어봅시다.
+
+```typescript
+// components/TodoCard.tsx
+
+import { Button, Flex, Input, Text } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FiEdit3, FiTrash2, FiX } from "react-icons/fi";
+
+interface TodoCardProps {
+  todo: ITodo;
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const TodoCard: FC<TodoCardProps> = ({ todo, todos, setTodos }) => {
+  const [isUpdateOpen, setIsUpdateOpen] = useState<boolean>(false);
+
+  const onClickIsDone = () => {
+    const temp = todos.map((v) => {
+      if (v.id === todo.id) {
+        // 기존 값을 교체
+        return { id: todo.id, content: todo.content, isDone: !todo.isDone };
+      } else {
+        // 기존 값 유지
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  const onClickDelete = () => {
+    const temp = todos.filter((v) => {
+      if (v.id !== todo.id) {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  return (
+    <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
+      {isUpdateOpen ? (
+        <Flex>
+          <Input />
+          <Button>수정</Button>
+        </Flex>
+      ) : (
+        <Text
+          fontSize={20}
+          w={48}
+          isTruncated={true}
+          textDecorationLine={`${todo.isDone ? "line-through" : ""}`}
+          onClick={onClickIsDone}
+        >
+          {todo.content}
+        </Text>
+      )}
+      <Button colorScheme="blue" onClick={() => setIsUpdateOpen(!isUpdateOpen)}>
+        {isUpdateOpen ? <FiX /> : <FiEdit3 />}
+      </Button>
+      <Button colorScheme="red" onClick={onClickDelete}>
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+export default TodoCard;
+```
+
+isUpdateOpen이 true일 경우 수정이 가능하고, true일 경우, Button의 아이콘이 FiX로 표현됩니다.
+
+<img
+  src="public/readme/todo13.png"
+  width="718"
+  alt="filter"
+/>
+
+```typescript
+import { Button, Flex, Input, Text } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FiEdit3, FiTrash2, FiX } from "react-icons/fi";
+
+interface TodoCardProps {
+  todo: ITodo;
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const TodoCard: FC<TodoCardProps> = ({ todo, todos, setTodos }) => {
+  const [isUpdateOpen, setIsUpdateOpen] = useState<boolean>(false);
+  const [content, setContent] = useState<string>("");
+
+  const onClickIsDone = () => {
+    const temp = todos.map((v) => {
+      if (v.id === todo.id) {
+        return { id: todo.id, content: todo.content, isDone: !todo.isDone };
+      } else {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  const onClickUpdate = () => {
+    if (!content) return;
+
+    const temp = todos.map((v) => {
+      if (v.id === todo.id) {
+        return { id: todo.id, content, isDone: todo.isDone };
+      } else {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+    setIsUpdateOpen(false);
+  };
+
+  const onClickDelete = () => {
+    const temp = todos.filter((v) => {
+      if (v.id !== todo.id) {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  return (
+    <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
+      {isUpdateOpen ? (
+        <Flex>
+          <Input value={content} onChange={(e) => setContent(e.target.value)} />
+          <Button colorScheme="green" ml={1} onClick={onClickUpdate}>
+            <FiEdit3 />
+          </Button>
+        </Flex>
+      ) : (
+        <Text
+          fontSize={20}
+          w={48}
+          isTruncated={true}
+          textDecorationLine={`${todo.isDone ? "line-through" : ""}`}
+          onClick={onClickIsDone}
+        >
+          {todo.content}
+        </Text>
+      )}
+      <Button colorScheme="blue" onClick={() => setIsUpdateOpen(!isUpdateOpen)}>
+        {isUpdateOpen ? <FiX /> : <FiEdit3 />}
+      </Button>
+      <Button colorScheme="red" onClick={onClickDelete}>
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+export default TodoCard;
+```
+
+onClickUpdate 함수도 onClickIsDone 함수와 비슷합니다.
+
+코드를 작성 후, 실행해보면 수정이 잘 됩니다! 😃
+
+추가로 수정 버튼을 눌렀을 때 기존의 todo가 유지되어 수정이 가능하도록 해봅시다!
+
+content useState에 초기값을 빈 값("")이 아닌, todo.content로 수정해주면 됩니다.
+
+```typescript
+import { Button, Flex, Input, Text } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FiEdit3, FiTrash2, FiX } from "react-icons/fi";
+
+interface TodoCardProps {
+  todo: ITodo;
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const TodoCard: FC<TodoCardProps> = ({ todo, todos, setTodos }) => {
+  const [isUpdateOpen, setIsUpdateOpen] = useState<boolean>(false);
+  const [content, setContent] = useState<string>(todo.content);
+
+  const onClickIsDone = () => {
+    const temp = todos.map((v) => {
+      if (v.id === todo.id) {
+        return { id: todo.id, content: todo.content, isDone: !todo.isDone };
+      } else {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  const onClickUpdate = () => {
+    if (!content) return;
+
+    const temp = todos.map((v) => {
+      if (v.id === todo.id) {
+        return { id: todo.id, content, isDone: todo.isDone };
+      } else {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+    setIsUpdateOpen(false);
+  };
+
+  const onClickDelete = () => {
+    const temp = todos.filter((v) => {
+      if (v.id !== todo.id) {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  return (
+    <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
+      {isUpdateOpen ? (
+        <Flex>
+          <Input value={content} onChange={(e) => setContent(e.target.value)} />
+          <Button colorScheme="green" ml={1} onClick={onClickUpdate}>
+            <FiEdit3 />
+          </Button>
+        </Flex>
+      ) : (
+        <Text
+          fontSize={20}
+          w={48}
+          isTruncated={true}
+          textDecorationLine={`${todo.isDone ? "line-through" : ""}`}
+          onClick={onClickIsDone}
+        >
+          {todo.content}
+        </Text>
+      )}
+      <Button colorScheme="blue" onClick={() => setIsUpdateOpen(!isUpdateOpen)}>
+        {isUpdateOpen ? <FiX /> : <FiEdit3 />}
+      </Button>
+      <Button colorScheme="red" onClick={onClickDelete}>
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+export default TodoCard;
+```
+
+<img
+  src="public/readme/todo14.png"
+  width="718"
+  alt="update"
+/>
+
+⚠️ 현재 sampleData에 todo 3개가 있는데, 만약 3개를 다 삭제한다면 아래와 같은 오류가 발생합니다.
+
+<img
+  src="public/readme/error.png"
+  width="718"
+  alt="error"
+/>
+
+CreateTodo.tsx컴포넌트의 currentTodoId useState에 초기값을 옵셔널로 수정해줍니다.
+
+> const [currentTodoId, setCurrentTodoId] = useState<number>(todos[todos.length - 1]?.id);
+
+```typescript
+// components/CreateTodo.tsx
+
+import { Button, Flex, Input } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+
+interface CreateTodoProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
+  const [currentTodoId, setCurrentTodoId] = useState<number>(
+    todos[todos.length - 1]?.id
+  );
+
+  const [content, setContent] = useState<string>("");
+
+  const onClickCreateTodo = () => {
+    if (!content) return;
+
+    setTodos([...todos, { id: currentTodoId + 1, content, isDone: false }]);
+    setCurrentTodoId(currentTodoId + 1);
+    setContent("");
+  };
+
+  return (
+    <Flex
+      px={8}
+      bgColor="teal.200"
+      h={32}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Input
+        // maxW={328} 사이즈 조정해보기
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      />
+      <Button ml={2} colorScheme="teal" onClick={onClickCreateTodo}>
+        만들기
+      </Button>
+    </Flex>
+  );
+};
+
+export default CreateTodo;
+```
+
+<img
+  src="public/readme/error2.png"
+  width="718"
+  alt="error"
+/>
+
+이제 todo를 모두 삭제하더라도 에러가 발생하지 않습니다 🙂
