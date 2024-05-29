@@ -1,7 +1,7 @@
 // components/CreateTodo.tsx
 
 import { Button, Flex, Input } from "@chakra-ui/react";
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 
 interface CreateTodoProps {
   todos: ITodo[];
