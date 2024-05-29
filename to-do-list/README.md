@@ -750,3 +750,284 @@ export default CreateTodo;
 ```
 
 setTodos, setCurrentTodoId에 currenTodoId + 1을 해주고, 만들기 버튼을 누르면 content를 초기화 시켜주는 setContent("")도 추가했습니다.
+
+<img
+  src="public/readme/todo9.png"
+  width="718"
+  alt="fix error"
+/>
+
+위 코드를 실행하면 에러가 더 이상 발생하지 않습니다😁
+
+### 완료 (Update)
+
+완료 처리를 표현하기 위해서 `textDecorationLine="line-through"` 속성을 이용해 봅시다.
+
+```typescript
+// components/TodoCard.tsx
+
+import { Button, Flex, Text } from "@chakra-ui/react";
+import { FC } from "react";
+import { FiEdit3, FiTrash2 } from "react-icons/fi";
+
+interface TodoCardProps {
+  todo: ITodo;
+}
+
+const TodoCard: FC<TodoCardProps> = ({ todo }) => {
+  return (
+    <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
+      <Text
+        fontSize={20}
+        w={48}
+        isTruncated={true}
+        textDecorationLine="line-through"
+      >
+        {todo.content}
+      </Text>
+      <Button colorScheme="blue">
+        <FiEdit3 />
+      </Button>
+      <Button colorScheme="red">
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+export default TodoCard;
+```
+
+<img
+  src="public/readme/todo10.png"
+  width="718"
+  alt="fix error"
+/>
+
+위 처럼 line-through 가 적용된 것을 볼 수 있습니다. 위 효과와 삼항연사자를 사용해서 완료처리 해봅시다.
+
+isDone 값이 true일 경우 line-through가 되도록 해봅시다.
+
+먼저 isDone 값을 true로 바꾸는 기능은 안 만들었기 때문에, sampleData에서 1개만(햄버거) true로 바꾸겠습니다.
+
+```typescript
+import { Flex } from "@chakra-ui/react";
+import { FC, useState } from "react";
+import CreateTodo from "./components/CreateTodo";
+import TodoList from "./components/TodoList";
+
+const sampleData: ITodo[] = [
+  {
+    id: 1,
+    content: "🍚 밥먹기",
+    isDone: false,
+  },
+  {
+    id: 2,
+    content: "🍔 햄버거",
+    isDone: true,
+  },
+  {
+    id: 3,
+    content: "🍕 피자",
+    isDone: false,
+  },
+];
+
+const App: FC = () => {
+  const [todos, setTodos] = useState<ITodo[]>(sampleData);
+
+  return (
+    <Flex flexDir="column" minH="100vh">
+      <CreateTodo todos={todos} setTodos={setTodos} />
+      <TodoList todos={todos} />
+    </Flex>
+  );
+};
+
+export default App;
+```
+
+```typescript
+// components/TodoCard.tsx
+
+import { Button, Flex, Text } from "@chakra-ui/react";
+import { FC } from "react";
+import { FiEdit3, FiTrash2 } from "react-icons/fi";
+
+interface TodoCardProps {
+  todo: ITodo;
+}
+
+const TodoCard: FC<TodoCardProps> = ({ todo }) => {
+  return (
+    <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
+      <Text
+        fontSize={20}
+        w={48}
+        isTruncated={true}
+        textDecorationLine={`${todo.isDone ? "line-through" : ""}`}
+      >
+        {todo.content}
+      </Text>
+      <Button colorScheme="blue">
+        <FiEdit3 />
+      </Button>
+      <Button colorScheme="red">
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+export default TodoCard;
+```
+
+실행해보면 햄버거만 line-through가 젹용 된 것을 볼 수 있습니다.
+
+<img
+  src="public/readme/todo11.png"
+  width="718"
+  alt="line-through"
+/>
+
+이제 완료처리 기능을 만들어봅시다.
+
+todos의 값을 변경해야 하니 App.tsx에서 setTodos를 전달합니다.
+
+```typescript
+import { Flex } from "@chakra-ui/react";
+import { FC, useState } from "react";
+import CreateTodo from "./components/CreateTodo";
+import TodoList from "./components/TodoList";
+
+const sampleData: ITodo[] = [
+  {
+    id: 1,
+    content: "🍚 밥먹기",
+    isDone: false,
+  },
+  {
+    id: 2,
+    content: "🍔 햄버거",
+    isDone: true,
+  },
+  {
+    id: 3,
+    content: "🍕 피자",
+    isDone: false,
+  },
+];
+
+const App: FC = () => {
+  const [todos, setTodos] = useState<ITodo[]>(sampleData);
+
+  return (
+    <Flex flexDir="column" minH="100vh">
+      <CreateTodo todos={todos} setTodos={setTodos} />
+      <TodoList todos={todos} setTodos={setTodos} />
+    </Flex>
+  );
+};
+
+export default App;
+```
+
+그럼 TodoList에서 받아줘야겠죠?
+
+```typescript
+// components/TodoList.tsx
+
+import { Flex } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction } from "react";
+import TodoCard from "./TodoCard";
+
+interface TodoListProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const TodoList: FC<TodoListProps> = ({ todos, setTodos }) => {
+  return (
+    <Flex
+      bgColor="gray.50"
+      flexGrow={1}
+      flexDir="column"
+      alignItems="center"
+      pt={8}
+      gap={2}
+    >
+      {todos.map((v) => (
+        <TodoCard key={v.id} todo={v} todos={todos} setTodos={setTodos} />
+      ))}
+    </Flex>
+  );
+};
+
+export default TodoList;
+```
+
+받은 데이터를 TodoCard에도 전달해야 합니다.
+
+```typescript
+// components/TodoCard.tsx
+
+import { Button, Flex, Text } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction } from "react";
+import { FiEdit3, FiTrash2 } from "react-icons/fi";
+
+interface TodoCardProps {
+  todo: ITodo;
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const TodoCard: FC<TodoCardProps> = ({ todo, todos, setTodos }) => {
+  const onClickIsDone = () => {
+    const temp = todos.map((v) => {
+      if (v.id === todo.id) {
+        // 기존 값을 교체
+        return { id: todo.id, content: todo.content, isDone: !todo.isDone };
+      } else {
+        // 기존 값 유지
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+  return (
+    <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
+      <Text
+        fontSize={20}
+        w={48}
+        isTruncated={true}
+        textDecorationLine={`${todo.isDone ? "line-through" : ""}`}
+        onClick={onClickIsDone}
+      >
+        {todo.content}
+      </Text>
+      <Button colorScheme="blue">
+        <FiEdit3 />
+      </Button>
+      <Button colorScheme="red">
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+export default TodoCard;
+```
+
+todo, todos, setTodos를 받았으니 interface로 타입을 정의해줍니다.
+
+onClickDone 함수는 todos를 map함수로 순회하는데, v.id(전체 목록의 todo의 id 값) === todo.id(현재 클릭한 todo의 id값) 일치 할 경우 isDone을 true/false로 변환합니다.
+
+위 코드를 실행해해서, 완료처리가 안된 todo를 클릭하면 완료처리가 됩니다.
+
+<img
+  src="public/readme/todo12.png"
+  width="718"
+  alt="onClickDone"
+/>
