@@ -2,11 +2,11 @@ import { Flex } from "@chakra-ui/react";
 import { FC } from "react";
 import TodoCard from "./TodoCard";
 
-interface TodoList {
+interface TodoListProps {
   todos: ITodo[];
 }
 
-const TodoList: FC<TodoList> = ({ todos }) => {
+const TodoList: FC<TodoListProps> = ({ todos }) => {
   return (
     <Flex
       bgColor="gray.50"

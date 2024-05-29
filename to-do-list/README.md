@@ -369,11 +369,11 @@ import { Flex } from "@chakra-ui/react";
 import { FC } from "react";
 import TodoCard from "./TodoCard";
 
-interface TodoList {
+interface TodoListProps {
   todos: ITodo[];
 }
 
-const TodoList: FC<TodoList> = ({ todos }) => {
+const TodoList: FC<TodoListProps> = ({ todos }) => {
   return (
     <Flex
       bgColor="gray.50"
@@ -406,11 +406,11 @@ import { Flex } from "@chakra-ui/react";
 import { FC } from "react";
 import TodoCard from "./TodoCard";
 
-interface TodoList {
+interface TodoListProps {
   todos: ITodo[];
 }
 
-const TodoList: FC<TodoList> = ({ todos }) => {
+const TodoList: FC<TodoListProps> = ({ todos }) => {
   return (
     <Flex
       bgColor="gray.50"
@@ -439,11 +439,11 @@ import { Button, Flex, Text } from "@chakra-ui/react";
 import { FC } from "react";
 import { FiEdit3, FiTrash2 } from "react-icons/fi";
 
-interface TodoCard {
+interface TodoCardProps {
   todo: ITodo;
 }
 
-const TodoCard: FC<TodoCard> = ({ todo }) => {
+const TodoCard: FC<TodoCardProps> = ({ todo }) => {
   return (
     <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
       <Text fontSize={20} w={48} isTruncated={true}>
