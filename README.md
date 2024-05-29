@@ -47,15 +47,17 @@
   > 함수형 컴포넌트 (Functional Compoenent)  
   > Props
 
-### chakra-ui
+### chakra-ui & To Do List
 
 - 2024.5.29
+
+  Chakra UI
 
   > Chakra UI Setup  
   > Practice
 
-### To Do List
+  To Do List
 
-> 기본 셋팅  
-> 컴포넌트  
-> CRUD
+  > 기본 셋팅  
+  > 컴포넌트  
+  > CRUD
