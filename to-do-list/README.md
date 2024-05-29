@@ -358,6 +358,9 @@ const App: FC = () => {
 export default App;
 ```
 
+> ‼️ setTodos([...todos, newTodo]);  
+> 추후 위 처럼 setTodos에 기존 todos배열에 추가 될 수 있는 로직으로 작성 할 예정입니다.
+
 위 코드는 todos에서 에러가 발생합니다.
 
 TodoList에 props를 받아야 하는데 타입이 정의되어 있지 않기 때문입니다.
