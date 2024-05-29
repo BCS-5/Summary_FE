@@ -1,9 +1,18 @@
 // components/CreateTodo.tsx
 
 import { Button, Flex, Input } from "@chakra-ui/react";
-import { FC } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 
-const CreateTodo: FC = () => {
+interface CreateTodoProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
+  const [currentTodoId, setCurrentTodoId] = useState<number>(
+    todos[todos.length - 1].id
+  );
+
   return (
     <Flex
       px={8}

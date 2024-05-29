@@ -26,7 +26,7 @@ const App: FC = () => {
 
   return (
     <Flex flexDir="column" minH="100vh">
-      <CreateTodo />
+      <CreateTodo todos={todos} setTodos={setTodos} />
       <TodoList todos={todos} />
     </Flex>
   );

@@ -469,3 +469,119 @@ export default TodoCard;
   width="718"
   alt="todo6"
 />
+
+### 생성 (Create)
+
+이제 sampleData에서 가져오는게 아닌, 데이터 생성이 되도록 해봅시다.
+
+그리고 todos, setTodos도 CreateTodo에 props로 전달합니다.
+
+```typescript
+import { Flex } from "@chakra-ui/react";
+import { FC, useState } from "react";
+import CreateTodo from "./components/CreateTodo";
+import TodoList from "./components/TodoList";
+
+const sampleData: ITodo[] = [
+  {
+    id: 1,
+    content: "🍚 밥먹기",
+    isDone: false,
+  },
+  {
+    id: 2,
+    content: "🍔 햄버거",
+    isDone: false,
+  },
+  {
+    id: 3,
+    content: "🍕 피자",
+    isDone: false,
+  },
+];
+
+const App: FC = () => {
+  const [todos, setTodos] = useState<ITodo[]>(sampleData);
+
+  return (
+    <Flex flexDir="column" minH="100vh">
+      <CreateTodo todos={todos} setTodos={setTodos} />
+      <TodoList todos={todos} />
+    </Flex>
+  );
+};
+
+export default App;
+```
+
+```typescript
+// components/CreateTodo.tsx
+
+import { Button, Flex, Input } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction } from "react";
+
+interface CreateTodoProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const CreateTodo: FC = () => {
+  return (
+    <Flex
+      px={8}
+      bgColor="teal.200"
+      h={32}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Input />
+      <Button ml={2} colorScheme="teal">
+        만들기
+      </Button>
+    </Flex>
+  );
+};
+
+export default CreateTodo;
+```
+
+CreateTodoProps의 setTodos 타입은 setTodos에 마우스를 올려보시면 이중제네릭으로 타입이 확인가능합니다.
+
+그럼 CreateTodo에서 타입을 정의했으니 props를 받아볼까요?
+
+```typescript
+// components/CreateTodo.tsx
+
+import { Button, Flex, Input } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
+
+interface CreateTodoProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
+  const [currentTodoId, setCurrentTodoId] = useState<number>(
+    todos[todos.length - 1].id
+  );
+
+  return (
+    <Flex
+      px={8}
+      bgColor="teal.200"
+      h={32}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Input />
+      <Button ml={2} colorScheme="teal">
+        만들기
+      </Button>
+    </Flex>
+  );
+};
+
+export default CreateTodo;
+```
+
+생성할 때, content뿐만 아니라 id값도 필요하기 때문에 현재 id값을 알 수 있는 currentTodoId useState훅도 하나 만들어줍니다.
