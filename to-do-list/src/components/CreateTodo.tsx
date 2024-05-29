@@ -1,7 +1,7 @@
 // components/CreateTodo.tsx
 
 import { Button, Flex, Input } from "@chakra-ui/react";
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 
 interface CreateTodoProps {
   todos: ITodo[];
@@ -13,6 +13,16 @@ const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
     todos[todos.length - 1].id
   );
 
+  const [content, setContent] = useState<string>("");
+
+  const onClickCreateTodo = () => {
+    if (!content) return;
+
+    setTodos([...todos, { id: currentTodoId + 1, content, isDone: false }]);
+    setCurrentTodoId(currentTodoId + 1);
+    setContent("");
+  };
+
   return (
     <Flex
       px={8}
@@ -21,8 +31,8 @@ const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
       justifyContent="center"
       alignItems="center"
     >
-      <Input />
-      <Button ml={2} colorScheme="teal">
+      <Input value={content} onChange={(e) => setContent(e.target.value)} />
+      <Button ml={2} colorScheme="teal" onClick={onClickCreateTodo}>
         만들기
       </Button>
     </Flex>

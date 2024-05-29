@@ -311,6 +311,8 @@ export default TodoList;
 
 먼저 Todo에서 사용 할 타입을 인터페이스로 만들어봅시다.
 
+### 읽기 (Read)
+
 src폴더 하위에 index.d.ts 파일을 만들어 주세요.
 
 index.d.ts 파일은 TypeScript 프로젝트에서 주로 타입 선언을 저장하는 데 사용되는 파일입니다. 이 파일은 프로젝트 내의 타입 정의를 중앙에서 관리하고, 다른 파일에서 사용할 수 있도록 하기 위해 존재합니다.
@@ -588,3 +590,163 @@ export default CreateTodo;
 ```
 
 생성할 때, content뿐만 아니라 id값도 필요하기 때문에 현재 id값을 알 수 있는 currentTodoId useState훅도 하나 만들어줍니다.
+
+이제 사용자로부터 CreateTodo의 Input에서 값을 받아야겠죠?
+
+```typescript
+// components/CreateTodo.tsx
+
+import { Button, Flex, Input } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+
+interface CreateTodoProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
+  const [currentTodoId, setCurrentTodoId] = useState<number>(
+    todos[todos.length - 1].id
+  );
+
+  const [content, setContent] = useState<string>("");
+
+  useEffect(() => {
+    console.log(content);
+  }, [content]);
+
+  return (
+    <Flex
+      px={8}
+      bgColor="teal.200"
+      h={32}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Input value={content} onChange={(e) => setContent(e.target.value)} />
+      <Button ml={2} colorScheme="teal">
+        만들기
+      </Button>
+    </Flex>
+  );
+};
+
+export default CreateTodo;
+```
+
+위 코드를 실행시켜서 Input에 값이 잘 들어오는지 확인해보세요!
+
+<img
+  src="public/readme/todo7.png"
+  width="718"
+  alt="check input data"
+/>
+
+이제 Button에 onClick을 작성해서 setTodos에 추가 될 수 있도록 해봅시다.
+
+```typescript
+// components/CreateTodo.tsx
+
+import { Button, Flex, Input } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+
+interface CreateTodoProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
+  const [currentTodoId, setCurrentTodoId] = useState<number>(
+    todos[todos.length - 1].id
+  );
+
+  const [content, setContent] = useState<string>("");
+
+  const onClickCreateTodo = () => {
+    if (!content) return;
+
+    setTodos([...todos, { id: currentTodoId, content, isDone: false }]);
+    // content: content이기 때문에, key = value가 같다면 생략 가능.
+  };
+
+  return (
+    <Flex
+      px={8}
+      bgColor="teal.200"
+      h={32}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Input value={content} onChange={(e) => setContent(e.target.value)} />
+      <Button ml={2} colorScheme="teal" onClick={onClickCreateTodo}>
+        만들기
+      </Button>
+    </Flex>
+  );
+};
+
+export default CreateTodo;
+```
+
+<img
+  src="public/readme/todo8.png"
+  width="718"
+  alt="check mobile size"
+/>
+
+Input 에 데이터를 넣고 버튼을 클릭하면 생성되는 것을 확인 할 수 있습니다. 데이터 들어오는건 확인 했으니 useEffect는 삭제합니다.
+
+두 가지 문제점이 있죠? 먼저 key값이 중복된다는 오류가 발생합니다.
+
+> Warning: Encountered two children with the same key, `3`. Keys should be unique so that components maintain their identity across updates.
+
+위 이미지에서 '🍕피자'와 '생성 되나요?'의 키 값이 현재 3으로 동일하기 때문입니다.
+
+그리고, 만들기 버튼을 누르면 content부분이 사라지지 않죠.
+
+```typescript
+// components/CreateTodo.tsx
+
+import { Button, Flex, Input } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+
+interface CreateTodoProps {
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const CreateTodo: FC<CreateTodoProps> = ({ todos, setTodos }) => {
+  const [currentTodoId, setCurrentTodoId] = useState<number>(
+    todos[todos.length - 1].id
+  );
+
+  const [content, setContent] = useState<string>("");
+
+  const onClickCreateTodo = () => {
+    if (!content) return;
+
+    setTodos([...todos, { id: currentTodoId + 1, content, isDone: false }]);
+    setCurrentTodoId(currentTodoId + 1);
+    setContent("");
+  };
+
+  return (
+    <Flex
+      px={8}
+      bgColor="teal.200"
+      h={32}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Input value={content} onChange={(e) => setContent(e.target.value)} />
+      <Button ml={2} colorScheme="teal" onClick={onClickCreateTodo}>
+        만들기
+      </Button>
+    </Flex>
+  );
+};
+
+export default CreateTodo;
+```
+
+setTodos, setCurrentTodoId에 currenTodoId + 1을 해주고, 만들기 버튼을 누르면 content를 초기화 시켜주는 setContent("")도 추가했습니다.
