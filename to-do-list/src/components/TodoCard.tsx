@@ -24,6 +24,17 @@ const TodoCard: FC<TodoCardProps> = ({ todo, todos, setTodos }) => {
 
     setTodos(temp);
   };
+
+  const onClickDelete = () => {
+    const temp = todos.filter((v) => {
+      if (v.id !== todo.id) {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
   return (
     <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
       <Text
@@ -38,7 +49,7 @@ const TodoCard: FC<TodoCardProps> = ({ todo, todos, setTodos }) => {
       <Button colorScheme="blue">
         <FiEdit3 />
       </Button>
-      <Button colorScheme="red">
+      <Button colorScheme="red" onClick={onClickDelete}>
         <FiTrash2 />
       </Button>
     </Flex>

@@ -1031,3 +1031,91 @@ onClickDone 함수는 todos를 map함수로 순회하는데, v.id(전체 목록�
   width="718"
   alt="onClickDone"
 />
+
+### 삭제 (Delete)
+
+이제 삭제하는 기능을 filter함수를 사용해서 만들어 봅시다.
+
+맵함수가 아닌 필터 함수를 사용하는 이유를 아라볼까요?
+
+<img
+  src="public/readme/map.png"
+  width="718"
+  alt="map"
+/>
+
+맵 함수는 banana를 걸러주지만, 배열의 길이는 그대로고 undefined가 반환됩니다.
+
+<img
+  src="public/readme/filter.png"
+  width="718"
+  alt="filter"
+/>
+
+반면 filter함수는 배열에서 제외시키는 것을 볼 수 있습니다.
+
+따라서 TodoCard에서 onClickDelete 함수를 아래처럼 작성할 수 있습니다.
+
+```typescript
+// components/TodoCard.tsx
+
+import { Button, Flex, Text } from "@chakra-ui/react";
+import { Dispatch, FC, SetStateAction } from "react";
+import { FiEdit3, FiTrash2 } from "react-icons/fi";
+
+interface TodoCardProps {
+  todo: ITodo;
+  todos: ITodo[];
+  setTodos: Dispatch<SetStateAction<ITodo[]>>;
+}
+
+const TodoCard: FC<TodoCardProps> = ({ todo, todos, setTodos }) => {
+  const onClickIsDone = () => {
+    const temp = todos.map((v) => {
+      if (v.id === todo.id) {
+        // 기존 값을 교체
+        return { id: todo.id, content: todo.content, isDone: !todo.isDone };
+      } else {
+        // 기존 값 유지
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  const onClickDelete = () => {
+    const temp = todos.filter((v) => {
+      if (v.id !== todo.id) {
+        return v;
+      }
+    });
+
+    setTodos(temp);
+  };
+
+  return (
+    <Flex bgColor="white" px={4} py={2} rounded="lg" gap={1}>
+      <Text
+        fontSize={20}
+        w={48}
+        isTruncated={true}
+        textDecorationLine={`${todo.isDone ? "line-through" : ""}`}
+        onClick={onClickIsDone}
+      >
+        {todo.content}
+      </Text>
+      <Button colorScheme="blue">
+        <FiEdit3 />
+      </Button>
+      <Button colorScheme="red" onClick={onClickDelete}>
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+export default TodoCard;
+```
+
+코드를 실행해서 삭제가 잘 작동하는지 확인해보세요!
