@@ -1,0 +1,23 @@
+{
+  "name": "Character_jp",
+  "description": "This is description",
+  "image": "https://blue-ready-marmot-67.mypinata.cloud/ipfs/QmXEANmZSkRAecrHoKeg9hTh414WxeGfsLPYpCVxAX1Q7t",
+  "attributes": [
+    {
+      "trait_type": "Hair color",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Hair Accessories",
+      "value": "Bandana"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "long sword"
+    }
+  ]
+}

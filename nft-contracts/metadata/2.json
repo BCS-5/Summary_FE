@@ -1,0 +1,27 @@
+{
+  "name": "Character_jp",
+  "description": "This is description",
+  "image": "https://blue-ready-marmot-67.mypinata.cloud/ipfs/QmVjiES1eZteioniQtb75A6k3Chw33DPBCQZQbwg3TNcFU",
+  "attributes": [
+    {
+      "trait_type": "Hair color",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sky blue"
+    },
+    {
+      "trait_type": "Hair Accessories",
+      "value": "Hair pin"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Earing"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Aurora"
+    }
+  ]
+}
