@@ -280,3 +280,150 @@ https://testnets.opensea.io
 동일한 방법으로 2개 더 만들어보세요 😃
 
 만드셨다면, 오픈씨 컬렉션을 공유해주세요😁
+
+https://testnets.opensea.io/collection/aicharacter-1
+
+‼️ 추가로 오픈씨 컬렉션을 꾸미는 방법은 컬렉션 우측에 Edit collection을 클릭하셔서 수정하시면 됩니다.
+
+<img
+  src="readme/mint3.png"
+  width="718"
+  alt="edit collection"
+/>
+
+### Ownable
+
+https://docs.openzeppelin.com/contracts/5.x/api/access#Ownable
+
+Ownable에는 Modifiers로 onlyOwner() 함수가 있습니다. 이름에서 알 수 있듯이, 컨트렉트의 주인인지 확인 할 수 있는 함수입니다.
+
+그럼 constructor에 Ownable(msg.sender)를 붙여주면, msg.sender가 Owner겠죠?
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MintNft is ERC721Enumerable, Ownable {
+    mapping(uint => string) metadataUri;
+
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Ownable(msg.sender) {}
+
+    function mintNft(string memory _metadataUri) public {
+        uint tokenId = totalSupply() + 1;
+
+        _mint(msg.sender, tokenId);
+
+        metadataUri[tokenId] = _metadataUri;
+    }
+
+    function tokenURI(uint _tokenId) public view override returns (string memory) {
+        return metadataUri[_tokenId];
+    }
+}
+```
+
+Ownable도 상속받아서 사용합니다.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MintNft is ERC721Enumerable, Ownable {
+    mapping(uint => string) metadataUri;
+
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Ownable(msg.sender) {}
+
+    function mintNft(string memory _metadataUri) public onlyOwner {
+        uint tokenId = totalSupply() + 1;
+
+        _mint(msg.sender, tokenId);
+
+        metadataUri[tokenId] = _metadataUri;
+    }
+
+    function tokenURI(uint _tokenId) public view override returns (string memory) {
+        return metadataUri[_tokenId];
+    }
+}
+```
+
+mintNft 함수에 onlyOwner modifer를 추가해서 이제 해당 함수는 owner만 가능합니다.
+
+컨트렉트를 새로 배포하고 다른 계정으로 mintNft 함수를 실행하려 해보면 실행되지 않습니다.
+
+### Payable
+
+payable 키워드를 통해 특정 함수나 생성자(constructor)가 이더리움을 수신할 수 있도록 허용할 수 있습니다. 이를 통해 스마트 계약에서 이더리움의 입출금이 가능해집니다.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+
+contract MintNft is ERC721Enumerable {
+    mapping(uint => string) metadataUri;
+
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
+
+    function mintNft(string memory _metadataUri) public payable {
+
+        require(msg.value >= 0.01 ether, "Not enough ETH");
+
+        uint tokenId = totalSupply() + 1;
+
+        _mint(msg.sender, tokenId);
+
+        metadataUri[tokenId] = _metadataUri;
+    }
+
+    function tokenURI(uint _tokenId) public view override returns (string memory) {
+        return metadataUri[_tokenId];
+    }
+}
+```
+
+mintNft 함수에 payable 키워드를 사용해서 해당 함수를 실행하면 컨트렉트가 돈을 받게됩니다.
+
+require는 안에 조건이 true일 경우 이후 코드를 실행합니다. false일경우 "Not enough ETH"메세지를 출력합니다.
+
+msg.value는 sender가 보내는 이더리움의 양입니다. ether라는 키워드를 붙여서 ether단위이고, 키워드를 안붙이면 wei단위 입니다.
+
+그럼 컨트랙트가 아닌, 특정 지갑으로 돈을 보내게 하려면 어떻게 해야될까요?
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+
+contract MintNft is ERC721Enumerable {
+    mapping(uint => string) metadataUri;
+
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
+
+    function mintNft(string memory _metadataUri) public payable {
+        require(msg.value >= 0.01 ether, "Not enough ETH.");
+
+        uint tokenId = totalSupply() + 1;
+
+        _mint(msg.sender, tokenId);
+
+        metadataUri[tokenId] = _metadataUri;
+
+        payable("받을 지갑 주소").transfer(msg.value);
+    }
+
+    function tokenURI(uint _tokenId) public view override returns (string memory) {
+        return metadataUri[_tokenId];
+    }
+}
+```
+
+payable에 받을 지갑주소를 정해주시면 됩니다.

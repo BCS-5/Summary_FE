@@ -61,3 +61,28 @@
   > 기본 셋팅  
   > 컴포넌트  
   > CRUD
+
+### nft-contracts
+
+- 2024.5.30
+
+  > Remix ↔️ Localhost  
+  > Contract  
+  > 상속, Constructor  
+  > metadataUri  
+  > mintNft function  
+  > tokenURI function  
+  > Deploy  
+  > IPFS  
+  > Metadata  
+  > Mint  
+  > Ownable  
+  > Payable
+
+### word-app
+
+- 2024.6.3
+
+  > setting  
+  > Routing  
+  > Layout
