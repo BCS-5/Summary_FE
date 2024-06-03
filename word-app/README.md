@@ -290,7 +290,7 @@ export default Home;
 결과는 아래와 같습니다.
 
 <img
-  src="readme/home1.png"
+  src="public/readme/home1.png"
   width="718"
   alt="home1"
 />
@@ -328,6 +328,55 @@ const Home: FC = () => {
           >
             <Text fontWeight="bold" isTruncated={true}>
               Day {v.day}
+            </Text>
+            - {v.title}
+          </Button>
+        ))}
+      </Flex>
+    </Flex>
+  );
+};
+
+export default Home;
+```
+
+DailyWord에서 sampleData.json을 임포트해서 useParams 훅을 같이 사용해서 day 1, 2, 3... 을 받을 수 있습니다.
+
+또는 아래 처럼 page이동 할 때, 데이터를 같이 넘겨주는 방법이 있습니다.
+
+```typescript
+// src/pages/Home.tsx
+
+import { Button, Flex, Text } from "@chakra-ui/react";
+import { FC } from "react";
+import sampleData from "../assets/sampleData.json";
+import { useNavigate } from "react-router-dom";
+
+const Home: FC = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Text fontSize={48} fontWeight="bold" textAlign="center" mt={8}>
+        Word App
+      </Text>
+      <Flex flexDir="column" mt={8} gap={4} px={4}>
+        {sampleData.map((v: IWords) => (
+          <Button
+            key={v.day}
+            variant="outline"
+            colorScheme="teal"
+            justifyContent="start"
+            onClick={() =>
+              navigate(`/daily-word/${v.day}`, {
+                state: {
+                  wordData: v,
+                },
+              })
+            }
+          >
+            <Text fontWeight="bold" isTruncated={true}>
+              Day {v.day}
             </Text>{" "}
             - {v.title}
           </Button>
@@ -338,4 +387,290 @@ const Home: FC = () => {
 };
 
 export default Home;
+```
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import { Flex } from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+const DailyWord: FC = () => {
+  const { state } = useLocation();
+
+  useEffect(() => {
+    console.log(state);
+  }, []);
+
+  return <Flex>DailyWord</Flex>;
+};
+
+export default DailyWord;
+```
+
+그럼 console에서 값을 확인해봅시다.
+
+<img
+  src="public/readme/console1.png"
+  width="718"
+  alt="sampleData console"
+/>
+
+하지만 위 방법은 문제가 생길 수 있습니다.
+
+⚠️Button 태그에 onClick으로 데이터를 전달하는데, url에 직접 접근하게 되면, 데이터를 전달해주지 못합니다.(null)
+
+즉, 클릭해서 들어갈 때만 정상적으로 데이터를 전달합니다. ‼️따라서 예외처리 해주어야 합니다.
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import { Flex } from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  const { day } = useParams();
+
+  const { state } = useLocation();
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  return <Flex>DailyWord</Flex>;
+};
+
+export default DailyWord;
+```
+
+state가 없다면, 홈 주소로 돌려보냅니다.
+
+그런데 console.log(state)를 보면, state안에 wordData라는 객체가 있습니다.
+
+따라서 아래처럼 구조분해를 해줍니다.
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import { Flex } from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  const { day } = useParams();
+
+  const { state } = useLocation();
+  const { wordData }: { wordData: IWords } = state;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+  }, []);
+
+  return <Flex>DailyWord</Flex>;
+};
+
+export default DailyWord;
+```
+
+Home과 같이 디자인해봅시다.
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import { Flex, Text } from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  const { day } = useParams();
+
+  const { state } = useLocation();
+  const { wordData }: { wordData: IWords } = state;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+  }, []);
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Text fontSize={24} fontWeight="bold" textAlign="center" mt={8}>
+        <Text display="inline-block" fontWeight="bold">
+          Day {wordData.day}
+        </Text>
+        - {wordData.title}
+      </Text>
+    </Flex>
+  );
+};
+
+export default DailyWord;
+```
+
+### Chakra ui - Accordion
+
+https://v2.chakra-ui.com/docs/components/accordion/usage
+
+```typescript
+// src/pages/DailyWord.tsx
+
+// src/pages/DailyWord.tsx
+
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Flex,
+  Text,
+} from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  const { day } = useParams();
+
+  const { state } = useLocation();
+  const { wordData }: { wordData: IWords } = state;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Text fontSize={24} fontWeight="bold" textAlign="center" mt={8}>
+        <Text display="inline-block" fontWeight="bold">
+          Day {wordData.day}
+        </Text>
+        - {wordData.title}
+      </Text>
+      <Accordion mt={8} allowMultiple>
+        {wordData.sentences.map((v, i) => (
+          <AccordionItem key={i}>
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left">
+                  {v.english}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>{v.korean}</AccordionPanel>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </Flex>
+  );
+};
+
+export default DailyWord;
+```
+
+적용하면 아래와 같습니다.
+
+<img
+  src="public/readme/accordion.png"
+  width="718"
+  alt="accordion"
+/>
+
+### react-icons
+
+> npm i react-icons
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+  Flex,
+  Text,
+} from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FiVolume2 } from "react-icons/fi";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  //   const { day } = useParams();
+
+  const { state } = useLocation();
+  const { wordData }: { wordData: IWords } = state;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Text fontSize={24} fontWeight="bold" textAlign="center" mt={8}>
+        <Text display="inline-block" fontWeight="bold">
+          Day {wordData.day}
+        </Text>
+        - {wordData.title}
+      </Text>
+      <Accordion mt={8} allowMultiple>
+        {wordData.sentences.map((v, i) => (
+          <AccordionItem key={i}>
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left">
+                  {v.english}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+              <Button
+                variant="ghost"
+                size="xs"
+                mb={2}
+                ml={2}
+                colorScheme="teal"
+              >
+                <FiVolume2 />
+              </Button>
+            </h2>
+            <AccordionPanel pb={4}>{v.korean}</AccordionPanel>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </Flex>
+  );
+};
+
+export default DailyWord;
 ```
