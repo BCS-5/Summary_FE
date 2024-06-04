@@ -674,3 +674,852 @@ const DailyWord: FC = () => {
 
 export default DailyWord;
 ```
+
+## 에러 수정
+
+state값이 null일 경우는 에러가 발생합니다. 그리고 Chakra ui에서 Text컴포넌트 안에 Text를 사용해도 에러가 발생합니다.
+
+> TypeError: Cannot destructure property 'wordData' of 'state' as it is null.
+
+> `validateDOMNesting(...): <p> cannot appear as a descendant of <p>.`
+
+일단 아래와 같이 주석처리합니다.
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+  Flex,
+  Text,
+} from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FiVolume2 } from "react-icons/fi";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  //   const { day } = useParams();
+
+  const { state } = useLocation();
+  // const { wordData }: { wordData: IWords } = state;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  if (!state) return <div>Loading...</div>;
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Flex
+        fontSize={24}
+        fontWeight="bold"
+        textAlign="center"
+        mt={8}
+        justifyContent="center"
+      >
+        <Text fontWeight="bold">Day {state.wordData.day}</Text> -{" "}
+        {state.wordData.title}
+      </Flex>
+      <Accordion mt={8} allowMultiple>
+        {state.wordData.sentences.map((v, i) => (
+          <AccordionItem key={i}>
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left">
+                  {v.english}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+              <Button
+                variant="ghost"
+                size="xs"
+                mb={2}
+                ml={2}
+                colorScheme="teal"
+              >
+                <FiVolume2 />
+              </Button>
+            </h2>
+            <AccordionPanel pb={4}>{v.korean}</AccordionPanel>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </Flex>
+  );
+};
+
+export default DailyWord;
+```
+
+그리고 sentences의 맵함수에서 v, i값의 타입도 정의해야 합니다.
+
+Sentence는 아래와 같이 타입을 구분해줍니다.
+
+```typescript
+// index.d.ts
+
+interface ISentences {
+  english: string;
+  korean: string;
+}
+
+interface IWords {
+  day: number;
+  title: string;
+  sentences: ISentences[];
+}
+```
+
+수정된 코드는 아래와 같습니다.
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+  Flex,
+  Text,
+} from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FiVolume2 } from "react-icons/fi";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  const { state } = useLocation();
+  const wordData = state.wordData ?? null;
+  // const { wordData }: { wordData: IWords } = state;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  if (!state) return <div>Loading...</div>;
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Flex
+        fontSize={24}
+        fontWeight="bold"
+        textAlign="center"
+        mt={8}
+        justifyContent="center"
+      >
+        <Text fontWeight="bold">Day {state.wordData.day}</Text> -{" "}
+        {state.wordData.title}
+      </Flex>
+      <Accordion mt={8} allowMultiple>
+        {state.wordData.sentences.map((v: ISentences, i: number) => (
+          <AccordionItem key={i}>
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left">
+                  {v.english}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+              <Button
+                variant="ghost"
+                size="xs"
+                mb={2}
+                ml={2}
+                colorScheme="teal"
+              >
+                <FiVolume2 />
+              </Button>
+            </h2>
+            <AccordionPanel pb={4}>{v.korean}</AccordionPanel>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </Flex>
+  );
+};
+
+export default DailyWord;
+```
+
+코드를 간단하게 살펴볼까요?
+
+> const wordData = state.wordData ?? null;
+
+널 병합 연산자 (nullish coalescing operator) ??를 사용하여 state.wordData가 null 또는 undefined인 경우 wordData 변수를 null로 설정합니다.
+
+state.wordData가 null 또는 undefined가 아니면 wordData에 state.wordData의 값을 할당합니다.
+
+state.wordData가 null 또는 undefined이면 wordData에 null을 할당합니다.
+
+?? 연산자는 왼쪽 피연산자가 null 또는 undefined일 때만 오른쪽 피연산자를 반환합니다.
+
+## TTS (Text To Speech)
+
+> npm i axios
+
+WordCard.tsx 컴포넌트를 만들어주세요.
+
+AccordingItem부분을 컴포넌트화 시켜줍니다.
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button variant="ghost" colorScheme="green" size="sm" mb={2} ml={2}>
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+```typescript
+// src/pages/DailyWord.tsx
+
+import { Accordion, Flex, Text } from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import WordCard from "../conponents/WordCard";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  const { state } = useLocation();
+  const wordData = state.wordData ?? null;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  if (!state) return <div>Loading...</div>;
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Flex
+        fontSize={24}
+        fontWeight="bold"
+        textAlign="center"
+        mt={8}
+        justifyContent="center"
+      >
+        <Text fontWeight="bold">Day {state.wordData.day}</Text> -{" "}
+        {state.wordData.title}
+      </Flex>
+      <Accordion mt={8} allowMultiple>
+        {state.wordData.sentences.map((v: ISentences, i: number) => (
+          <WordCard key={i} sentence={v} />
+        ))}
+      </Accordion>
+    </Flex>
+  );
+};
+
+export default DailyWord;
+```
+
+이제 onClickAutio 함수를 만들어 봅시다.
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        {
+          input: {
+            text: sentence.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          mb={2}
+          ml={2}
+          onClick={onClickAudio}
+        >
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+axios.post의 api요청부분에서 키 값은 수정해서 사용해주세요.
+
+오디오 버튼의 onClick을 실행하면 아래와 같은 응답을 받을 수 있습니다.
+
+<img
+  src="public/readme/audio1.png"
+  width="718"
+  alt="audio"
+/>
+
+이제 response.data.audioContent를 오디오로 변환해봅시다.
+
+### audioContent
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        {
+          input: {
+            text: sentence.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const binaryData = atob(response.data.audioContent);
+
+      console.log(response);
+      console.log(binaryData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          mb={2}
+          ml={2}
+          onClick={onClickAudio}
+        >
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+binaryData를 확인해보면 아래와 같은 결과가 나옵니다.
+
+<img
+  src="public/readme/audio2.png"
+  width="718"
+  alt="binaryData"
+/>
+
+그리고 binaryData ➡️ byteArray 바꿔줍니다.
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        {
+          input: {
+            text: sentence.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const binaryData = atob(response.data.audioContent);
+      const byteArray = new Uint8Array(binaryData.length);
+
+      console.log(response);
+      console.log(binaryData);
+      console.log(byteArray);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          mb={2}
+          ml={2}
+          onClick={onClickAudio}
+        >
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+<img
+  src="public/readme/audio3.png"
+  width="718"
+  alt="byteArray"
+/>
+
+byteArray는 음성의 길이만큼의 0으로만 이루어진 배열의 길이가 생성됩니다.
+
+이제 배열에 값을 넣어줘야 합니다.
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        {
+          input: {
+            text: sentence.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const binaryData = atob(response.data.audioContent);
+      const byteArray = new Uint8Array(binaryData.length);
+
+      for (let i = 0; i < binaryData.length; i++) {
+        byteArray[i] = binaryData.charCodeAt(i);
+      }
+      console.log(byteArray);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          mb={2}
+          ml={2}
+          onClick={onClickAudio}
+        >
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+<img
+  src="public/readme/audio4.png"
+  width="718"
+  alt="byteArray repeat"
+/>
+
+byteArray에 uint8값이 채워진 것을 볼 수 있습니다.
+
+### blob
+
+byteArray를 blob형태로 변환합니다.
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        {
+          input: {
+            text: sentence.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const binaryData = atob(response.data.audioContent);
+      const byteArray = new Uint8Array(binaryData.length);
+
+      for (let i = 0; i < binaryData.length; i++) {
+        byteArray[i] = binaryData.charCodeAt(i);
+      }
+
+      const blob = new Blob([byteArray.buffer], { type: "audio/mp3" });
+      console.log(blob);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          mb={2}
+          ml={2}
+          onClick={onClickAudio}
+        >
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+### blob to audio
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        {
+          input: {
+            text: sentence.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const binaryData = atob(response.data.audioContent);
+      const byteArray = new Uint8Array(binaryData.length);
+
+      for (let i = 0; i < binaryData.length; i++) {
+        byteArray[i] = binaryData.charCodeAt(i);
+      }
+
+      const blob = new Blob([byteArray.buffer], { type: "audio/mp3" });
+
+      const newAudio = new Audio(URL.createObjectURL(blob));
+
+      console.log(newAudio);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          mb={2}
+          ml={2}
+          onClick={onClickAudio}
+        >
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+<img
+  src="public/readme/audio5.png"
+  width="718"
+  alt="audio"
+/>
+
+이제 실행하면 위와같은 결과가 나옵니다. 위 audio를 사용하면 됩니다!
