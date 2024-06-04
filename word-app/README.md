@@ -1523,3 +1523,415 @@ export default WordCard;
 />
 
 이제 실행하면 위와같은 결과가 나옵니다. 위 audio를 사용하면 됩니다!
+
+```typescript
+// components/WordCard.tsx
+
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FC } from "react";
+import { FiVolume2 } from "react-icons/fi";
+
+interface WordCardProps {
+  sentence: ISentences;
+}
+
+const WordCard: FC<WordCardProps> = ({ sentence }) => {
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        {
+          input: {
+            text: sentence.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const binaryData = atob(response.data.audioContent);
+      const byteArray = new Uint8Array(binaryData.length);
+
+      for (let i = 0; i < binaryData.length; i++) {
+        byteArray[i] = binaryData.charCodeAt(i);
+      }
+
+      const blob = new Blob([byteArray.buffer], { type: "audio/mp3" });
+
+      const newAudio = new Audio(URL.createObjectURL(blob));
+
+      document.body.appendChild(newAudio);
+      newAudio.play();
+
+      console.log(newAudio);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box as="span" flex="1" textAlign="left">
+            {sentence.english}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <Button
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          mb={2}
+          ml={2}
+          onClick={onClickAudio}
+        >
+          <FiVolume2 />
+        </Button>
+      </h2>
+      <AccordionPanel pb={4}>{sentence.korean}</AccordionPanel>
+    </AccordionItem>
+  );
+};
+
+export default WordCard;
+```
+
+## Layout
+
+```typescript
+import { Accordion, Button, Flex, Text } from "@chakra-ui/react";
+import { FC, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FiArrowLeft } from "react-icons/fi";
+
+import WordCard from "../conponents/WordCard";
+
+const DailyWord: FC = () => {
+  const navigate = useNavigate();
+
+  const { state } = useLocation();
+  // const wordData = state.wordData ?? null;
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  if (!state) return <div>Loading...</div>;
+
+  return (
+    <Flex
+      position="relative"
+      flexDir="column"
+      maxW={768}
+      mx="auto"
+      minH="100vh"
+    >
+      <Button
+        m={4}
+        position="absolute"
+        variant="ghost"
+        colorScheme="transparent"
+        onClick={() => navigate("/")}
+      >
+        <FiArrowLeft />
+      </Button>
+      <Flex
+        fontSize={24}
+        fontWeight="bold"
+        textAlign="center"
+        mt={8}
+        justifyContent="center"
+      >
+        Day {state.wordData.day} - {state.wordData.title}
+      </Flex>
+      <Accordion mt={8} allowMultiple>
+        {state.wordData.sentences.map((v: ISentences, i: number) => (
+          <WordCard key={i} sentence={v} />
+        ))}
+      </Accordion>
+    </Flex>
+  );
+};
+
+export default DailyWord;
+```
+
+또는 아래와 같은 UI로도 변경 할 수 있습니다.
+
+2개를 비교해 봅시다.
+
+AnotherDailyWord.tsx 페이지를 만들어줍니다.
+
+```typescript
+// App.tsx
+
+import { FC } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./pages/Home";
+import DailyWord from "./pages/DailyWord";
+import AnotherDailyWord from "./pages/AnotherDailyWord";
+
+const App: FC = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/daily-word/:day" element={<DailyWord />} />
+        <Route path="/another-daily-word/:day" element={<AnotherDailyWord />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;
+```
+
+```typescript
+// src/pages/Home.tsx
+
+import { Button, Flex, Text } from "@chakra-ui/react";
+import { FC } from "react";
+import sampleData from "../assets/sampleData.json";
+import { useNavigate } from "react-router-dom";
+
+const Home: FC = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Flex flexDir="column" maxW={768} mx="auto" minH="100vh">
+      <Text fontSize={48} fontWeight="bold" textAlign="center" mt={8}>
+        Word App
+      </Text>
+      <Flex flexDir="column" mt={8} gap={4} px={4}>
+        {sampleData.map((v: IWords) => (
+          <Button
+            key={v.day}
+            variant="outline"
+            colorScheme="teal"
+            justifyContent="start"
+            onClick={() =>
+              navigate(`/daily-word/${v.day}`, {
+                state: {
+                  wordData: v,
+                },
+              })
+            }
+          >
+            <Text fontWeight="bold" isTruncated={true}>
+              Day {v.day}
+            </Text>
+            - {v.title}
+          </Button>
+        ))}
+      </Flex>
+      <Flex flexDir="column" mt={16} gap={4} px={4}>
+        {sampleData.map((v: IWords) => (
+          <Button
+            key={v.day}
+            variant="outline"
+            colorScheme="green"
+            justifyContent="start"
+            isTruncated={true}
+            onClick={() =>
+              navigate(`/another-daily-word/${v.day}`, {
+                state: {
+                  wordData: v,
+                },
+              })
+            }
+          >
+            <Text fontWeight="bold">Day {v.day}</Text> - {v.title}
+          </Button>
+        ))}
+      </Flex>
+    </Flex>
+  );
+};
+
+export default Home;
+```
+
+```typescript
+import { Button, Flex, Text } from "@chakra-ui/react";
+import axios from "axios";
+import { FC, useEffect, useState } from "react";
+import { FiArrowLeft, FiArrowRight, FiVolume2 } from "react-icons/fi";
+import { useLocation, useNavigate } from "react-router-dom";
+
+const AnotherDailyWord: FC = () => {
+  const [currentSentenceNumber, setCurrentSentenceNumber] = useState<number>(0);
+  const [isClicked, setIsClicked] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const { state } = useLocation();
+
+  const onClickAudio = async () => {
+    try {
+      const response = await axios.post(
+        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyDTOET8PjC5osQiGI6V-W9m-upA9ri_1bo",
+        {
+          input: {
+            text: state.wordData.sentences[currentSentenceNumber]?.english,
+          },
+          voice: {
+            languageCode: "en-US",
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const binaryData = atob(response.data.audioContent);
+
+      const byteArray = new Uint8Array(binaryData.length);
+
+      for (let i = 0; i < binaryData.length; i++) {
+        byteArray[i] = binaryData.charCodeAt(i);
+      }
+
+      const blob = new Blob([byteArray.buffer], { type: "audio/mp3" });
+
+      const newAudio = new Audio(URL.createObjectURL(blob));
+
+      document.body.appendChild(newAudio);
+
+      newAudio.play();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onClickPrev = () => {
+    if (currentSentenceNumber === 0) {
+      setCurrentSentenceNumber(state.wordData.sentences.length - 1);
+    } else {
+      setCurrentSentenceNumber(currentSentenceNumber - 1);
+    }
+  };
+
+  const onClickNext = () => {
+    if (currentSentenceNumber === state.wordData.sentences.length - 1) {
+      setCurrentSentenceNumber(0);
+    } else {
+      setCurrentSentenceNumber(currentSentenceNumber + 1);
+    }
+  };
+
+  useEffect(() => {
+    if (!state) {
+      navigate("/");
+    }
+
+    console.log(state);
+  }, []);
+
+  if (!state) return <div>Loading...</div>;
+
+  return (
+    <Flex
+      position="relative"
+      flexDir="column"
+      maxW={768}
+      mx="auto"
+      minH="100vh"
+    >
+      <Button
+        m={4}
+        position="absolute"
+        variant="ghost"
+        colorScheme="transparent"
+        onClick={() => navigate("/")}
+      >
+        <FiArrowLeft />
+      </Button>
+      <Flex
+        fontSize={24}
+        fontWeight="bold"
+        textAlign="center"
+        mt={8}
+        justifyContent="center"
+      >
+        Day {state.wordData.day} - {state.wordData.title}
+      </Flex>
+      <Flex mt={8} flexDirection="column" px={4}>
+        <Text>{state.wordData.sentences[currentSentenceNumber]?.english}</Text>
+        <Text
+          bgColor={isClicked ? "" : "black"}
+          mt={2}
+          cursor="pointer"
+          onClick={() => setIsClicked(!isClicked)}
+        >
+          {state.wordData.sentences[currentSentenceNumber]?.korean}
+        </Text>
+        <Flex mt={2} gap={2}>
+          <Button
+            variant="ghost"
+            colorScheme="green"
+            size="sm"
+            mb={2}
+            ml={2}
+            onClick={onClickPrev}
+          >
+            <FiArrowLeft />
+          </Button>
+          <Button
+            variant="ghost"
+            colorScheme="green"
+            size="sm"
+            mb={2}
+            ml={2}
+            onClick={onClickNext}
+          >
+            <FiArrowRight />
+          </Button>
+          <Button
+            variant="ghost"
+            colorScheme="green"
+            size="sm"
+            mb={2}
+            ml={2}
+            onClick={onClickAudio}
+          >
+            <FiVolume2 />
+          </Button>
+        </Flex>
+      </Flex>
+    </Flex>
+  );
+};
+
+export default AnotherDailyWord;
+```
+
+실행해보고 위 코드와 DailyWord.tsx을 비교해보세요 🙂
