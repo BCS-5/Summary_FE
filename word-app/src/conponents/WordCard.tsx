@@ -20,7 +20,9 @@ const WordCard: FC<WordCardProps> = ({ sentence }) => {
   const onClickAudio = async () => {
     try {
       const response = await axios.post(
-        "https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyCXdV9VlnVIIJEdXAHT2C3fcGwY5qKLbl8",
+        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${
+          import.meta.env.VITE_API_KEY
+        }`,
         {
           input: {
             text: sentence.english,
